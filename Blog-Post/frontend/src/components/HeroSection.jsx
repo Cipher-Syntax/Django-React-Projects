@@ -1,26 +1,65 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import bgImage from  '../assets/background_img.jpg'
+import api from '../api'
 
 const HeroSection = () => {
+    const [randomPost, setRandomPost] = useState(null)
+
+    useEffect(() => {
+        getRandomPost()
+    }, [])
+
+    const getRandomPost = async () => {
+        try {
+            const response = await api.get('api/posts/')
+            if (response.data) {
+                // Seed randomness by date → stable for the whole day
+                const today = new Date().toDateString()
+
+                // turns date string into a number (seed)
+                const hash = today.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)
+
+                // always within the range of available posts
+                const randomIndex = hash % response.data.length
+
+                // this will be the "random for today" post
+                setRandomPost(response.data[randomIndex]) 
+            }
+        } 
+        catch (error) {
+            console.error('Failed to get random post: ', error)
+        }
+    }
+
+    if (!randomPost) return null
+
+    const formattedDate = new Date(randomPost.created_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    })
 
     return (
         //  huge ass div with image
-        <div className='mx-20 mt-15 px-25 py-10 relative' style={{ backgroundImage: `url(${bgImage})`}}>
+        <div className='mx-20 mt-15 px-25 py-10 relative' style={{ backgroundImage: `url(${randomPost.image ? randomPost.image : bgImage})`}}>
             <div className='w-[40%] h-full absolute top-0 left-0 bg-black z-0'></div>
 
             <div className='w-[50%] mr-auto bg-white p-15 py-20 min-h-150 flex flex-col gap-6 relative z-10'>
                 <div className='flex gap-4 text-sm'>
-                    <span>FEBRUARY 1, 2019</span>
+                    <span>{formattedDate}</span>
                     <span>•</span>
-                    <span>FEATURED</span>
+                    <span>{randomPost.category?.name || "General"}</span>
                     <span>•</span>
-                    <span>4 COMMENTS</span>
+                    <span>{randomPost.comments?.length || 0} COMMENTS</span>
                 </div>
 
-                    <div className='w-50 h-1 bg-red-500'></div>
+                <div className='w-50 h-1 bg-red-500'></div>
 
-                <h1 className='text-[2.5rem] font-extrabold leading-tight tracking-tight    '>At daybreak of the fifteen day of my search</h1>
-                <h3>When the ampitheater had cleared had cleared I crept stealthily to the top and as the great excavation lay...</h3>
+                <h1 className='text-[2.5rem] font-extrabold leading-tight tracking-tight '>
+                    {randomPost.title}
+                </h1>
+                {/* show a preview of content */}
+                <h3>{randomPost.content?.slice(0, 150)}...</h3>
             </div>
         </div>
     )
