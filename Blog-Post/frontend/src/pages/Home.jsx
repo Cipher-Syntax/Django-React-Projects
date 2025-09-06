@@ -1,11 +1,12 @@
 import React from 'react'
-import { Header, Features } from '../components'
+import { Header, Features, Cards } from '../components'
 
 const Home = () => {
   return (
     <>
       <Header></Header>
       <Features></Features>
+      <Cards></Cards>
     </>
   )
 }
