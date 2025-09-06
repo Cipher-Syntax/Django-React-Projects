@@ -10,8 +10,7 @@ const Features = () => {
 
   return (
     <section>
-      <nav className="flex flex-col sm:flex-row items-center justify-center gap-15 text-center mt-8">
-
+      <nav className="flex flex-col sm:flex-row items-center justify-center gap-15 text-center mt-8 backhro">
         <div className="flex sm:hidden items-center justify-center gap-3 underline mr-auto pl-[60px] cursor-pointer" onClick={handleSidebarFeature}>
           <h1 className="font-semibold text-[20px]">FEATURES</h1>
           <IoIosArrowDown size={24} />
