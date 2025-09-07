@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { Header, Features, HeroSection, Cards } from '../components'
 
 const Home = () => {

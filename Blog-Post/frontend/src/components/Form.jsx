@@ -4,65 +4,63 @@ import { useNavigate } from 'react-router-dom'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants'
 import LoadingIndicator from './LoadingIndicator'
 
-const Form = ({ route, method }) => {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
+const Form = ({route, method}) => {
 
-  const status = method === "login" ? "Login" : "Register"
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    setLoading(true)
-    e.preventDefault()
+    const status = method === "login" ? "Login" : "Register";
 
-    try{
-        const response = await api.post(route, {username, email, password})
+    const handleSubmit = async (e) => {
+        setLoading(true)
+        e.preventDefault()
 
-        if(method === "login"){
-            localStorage.setItem(ACCESS_TOKEN, response.data.access)
-            localStorage.setItem(REFRESH_TOKEN, response.data.refresh)
-            navigate('/')
-        }
-        else{
-            navigate('/login')
-        }
-    }
-    catch(error){
-        if(error.response){
-            if(error.response.status === 401){
-                const errorDetail = error.response.detail;
-                if(errorDetail === "No active account found with the given credentials"){
-                    setError("Invalid username or password")
-                }
-                else{
-                    alert(errorDetail)
-                }
-            }
-            else if(error.response.status === 400){
-                if(error.response.data.username){
-                    setError(error.response.data.username[0]);
-                }
-                else if (error.response.data.email){
-                    setError(error.response.data.email[0])
-                }
-                else{
-                    setError("Invalide input. Please input the correct credentials")
-                }
+        try{
+            const response = await api.post(route, {username, password})
+
+            if (method === "login"){
+                localStorage.setItem(ACCESS_TOKEN, response.data.access);
+                localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
+                navigate('/')
             }
             else{
-                setError("Something went wrong")
+                navigate('/login');
+            }
+
+        }
+        catch(err){
+            if (err.response) {
+                if (err.response.status === 401) {
+                    const errorDetail = err.response.data.detail;
+                    if (errorDetail === "No active account found with the given credentials") {
+                        setError("Invalid username or password.");
+                    } else {
+                        alert(errorDetail);
+                    }
+                } 
+                else if (err.response.status === 400) {
+                    if (err.response.data.username) {
+                        setError(err.response.data.username[0]);
+                    } else {
+                        setError("Invalid input. Check your username and password.")
+                    }
+                } 
+                else {
+                    setError("Something went wrong.");
+                }
+            } else {
+                setError("Network error. Please check your connection.");
             }
         }
-        else{
-            setError("Network error. Please check your connection")
+
+
+        finally{
+            setLoading(false)
         }
-    }
-    finally{
-        setLoading(false)
-    }
+
   }
 
   return (
@@ -82,20 +80,6 @@ const Form = ({ route, method }) => {
             className="outline-1 p-[8px] mb-3 rounded-md"
           />
         </div>
-
-        {method !== "login" && (
-          <div className="flex flex-col">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="outline-1 p-[8px] mb-3 rounded-md"
-            />
-          </div>
-        )}
 
         <div className="flex flex-col">
           <label htmlFor="password">Password</label>
