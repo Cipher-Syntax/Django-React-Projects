@@ -6,17 +6,12 @@ from .models import Category, Post, Comment, Like
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("That username is already taken.")
-        return value
-    
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("That email is already taken.")
         return value
     
     def create(self, validated_data):
