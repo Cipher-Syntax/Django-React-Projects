@@ -33,11 +33,6 @@ const HeroSection = () => {
 
     if (!randomPost) return null
 
-    const formattedDate = new Date(randomPost.created_at).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    })
 
     return (
         //  huge ass div with image
@@ -46,11 +41,11 @@ const HeroSection = () => {
 
             <div className='w-[50%] mr-auto bg-white p-15 py-20 min-h-150 flex flex-col gap-6 relative z-10'>
                 <div className='flex gap-4 text-sm'>
-                    <span>{formattedDate}</span>
+                    <span>{new Date(randomPost.created_at).toLocaleDateString("en-US")}</span>
                     <span>•</span>
                     <span>{randomPost.category?.name || "General"}</span>
                     <span>•</span>
-                    <span>{randomPost.comments?.length || 0} COMMENTS</span>
+                    <span>{randomPost.comment_counts || 0} COMMENTS</span>
                 </div>
 
                 <div className='w-50 h-1 bg-red-500'></div>

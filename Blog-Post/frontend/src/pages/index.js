@@ -3,6 +3,7 @@ import Register from './Register'
 import Home from './Home'
 import NotFound from './NotFound'
 import CreatePost from "./CreatePost";
+import PostDetail from "./PostDetail";
 
 export {
     Login,
@@ -10,4 +11,5 @@ export {
     Home,
     NotFound,
     CreatePost,
+    PostDetail,
 }

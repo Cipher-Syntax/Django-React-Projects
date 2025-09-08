@@ -1,31 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import api from '../api';
 import { ACCESS_TOKEN } from '../constants';
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { useFetchCategory } from '../hooks';
 
 const CreatePost = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [image, setImage] = useState(null);
     const [message, setMessage] = useState("");
-    const [categoryId, setCategoryId] = useState("");
-    const [categories, setCategories] = useState([]);
-
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
-    const fetchCategories = async () => {
-        try {
-            const response = await api.get('api/categories/', {
-                headers: { 'Authorization': `Bearer ${ACCESS_TOKEN}` }
-            });
-            setCategories(response.data);
-        } 
-        catch (error) {
-            console.error('Failed to fetch categories:', error);
-        }
-    };
+    const { categories, categoryId, setCategoryId } = useFetchCategory();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,6 +32,7 @@ const CreatePost = () => {
             setContent("");
             setImage(null);
             setCategoryId("");
+            
         } 
         catch (error) {
             console.error('Failed to create blog: ', error);
@@ -67,7 +52,7 @@ const CreatePost = () => {
 
                 <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} required/>
 
-                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="border p-2 rounded" require >
+                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="border p-2 rounded" required >
                     <option value="" disabled>Select category</option>
                     {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
