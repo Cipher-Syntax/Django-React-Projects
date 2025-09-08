@@ -29,10 +29,12 @@ class PostSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
         queryset = Category.objects.all(), source='category', write_only=True
     )
+    like_counts = serializers.IntegerField(source="likes.count", read_only=True)
+    comment_counts = serializers.IntegerField(source="comments.count", read_only=True)
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'image',  'author', 'category', 'category_id', 'created_at']
+        fields = ['id', 'title', 'content', 'image',  'author', 'category', 'category_id', 'created_at', 'like_counts', 'comment_counts']
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
