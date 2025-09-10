@@ -27,9 +27,20 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-created_at')
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_queryset(self):
+        post_id = self.request.query_params.get('post_id')
+        
+        if post_id:
+            return Comment.objects.filter(post__id=post_id).order_by('-created_at')
+        
+        return Comment.objects.all().order_by('-created_at')
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+        
+    
+    
 
 class LikeViewSet(viewsets.ModelViewSet):
     queryset = Like.objects.all()
