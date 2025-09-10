@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import bgImage from  '../assets/background_img.jpg'
 import api from '../api'
+import { Link } from 'react-router-dom'
+import { IoIosArrowRoundForward } from "react-icons/io";
 
 const HeroSection = () => {
     const [randomPost, setRandomPost] = useState(null)
@@ -55,6 +57,11 @@ const HeroSection = () => {
                 </h1>
                 {/* show a preview of content */}
                 <h3>{randomPost.content?.slice(0, 150)}...</h3>
+
+                <Link to={`/posts/${randomPost.id}/`} className='flex items-center justify-start mt-2 cursor-pointer text-[12px] gap-3 text-red-400 hover:text-red-500 hover:underline'>
+                    <p>READ MORE</p>
+                    <IoIosArrowRoundForward size={20} />
+                </Link>
             </div>
         </div>
     )
