@@ -38,7 +38,7 @@ const HeroSection = () => {
 
     return (
         //  huge ass div with image
-        <div className='mx-20 mt-15 px-25 py-10 relative' style={{ backgroundImage: `url(${randomPost.image ? randomPost.image : bgImage})`}}>
+        <div className='hidden sm:block mx-20 mt-15 px-25 py-10 relative' style={{ backgroundImage: `url(${randomPost.image ? randomPost.image : bgImage})`}}>
             <div className='w-[40%] h-full absolute top-0 left-0 bg-black z-0'></div>
 
             <div className='w-[50%] mr-auto bg-white p-15 py-20 min-h-150 flex flex-col gap-6 relative z-10'>
