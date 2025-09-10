@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import bgImage from  '../assets/background_img.jpg'
-import api from '../api'
+import api from '../api/api'
 import { Link } from 'react-router-dom'
 import { IoIosArrowRoundForward } from "react-icons/io";
 

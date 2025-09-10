@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../api';
+import api from '../api/api';
 import { ACCESS_TOKEN } from '../constants';
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useFetchCategory } from '../hooks';

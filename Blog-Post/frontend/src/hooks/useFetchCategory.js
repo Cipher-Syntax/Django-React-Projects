@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react'
 import { ACCESS_TOKEN } from '../constants'
-import api from '../api';
+import api from '../api/api';
 
 const useFetchCategory = () => {
     const [categories, setCategories] = useState([]);
