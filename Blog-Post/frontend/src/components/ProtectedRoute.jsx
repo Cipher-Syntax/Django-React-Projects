@@ -3,13 +3,22 @@ import { Navigate } from 'react-router-dom'
 import jwtDecode from 'jwt-decode';
 import api from  '../api'
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants'
+import LoadingIndicator from './LoadingIndicator';
 
 const ProtectedRoute = ({ children }) => {
     const [isAuthorized, setIsAuthorized] = useState(null)
 
     useEffect(() => {
-        auth().catch(() => setIsAuthorized(false))
-    }, [])
+        auth().catch(() => setIsAuthorized(false));
+
+        const timer = setTimeout(() => {
+            if(isAuthorized === null){
+                setIsAuthorized(false);
+            }
+        }, 3000)
+
+        return () => clearTimeout(timer);
+    }, [isAuthorized])
 
     const refreshToken = async () => {
         const refreshToken = localStorage.getItem(REFRESH_TOKEN)
@@ -53,7 +62,12 @@ const ProtectedRoute = ({ children }) => {
 
 
     if(isAuthorized == null){
-        return <div>Loading....</div>
+        return (
+            <div className='flex flex-col text-center items-center justify-center min-h-screen'>
+                <h1 className='text-3xl font-bold'>Loading...</h1>
+                <LoadingIndicator></LoadingIndicator>
+            </div>
+        )
         
     }
     return isAuthorized ? children : <Navigate to="/login" replace></Navigate> 
