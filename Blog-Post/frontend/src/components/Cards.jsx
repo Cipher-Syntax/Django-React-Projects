@@ -29,8 +29,8 @@ const Cards = () => {
                                     <h2 className='text-[20px] font-semibold'>{post.title}</h2>
 
                                     <div className='flex gap-2 text-[12px] font-bold mt-2'>
-                                        <p>{formattedDate}</p>
-                                        <p>{post.category?.name}</p>
+                                        <p>{formattedDate} • </p>
+                                        <p>{post.category?.name} • </p>
                                         <p>{post.comment_counts || 0} Comments</p>
                                     </div>
 
