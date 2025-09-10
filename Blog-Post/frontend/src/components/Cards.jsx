@@ -53,9 +53,9 @@ const Cards = () => {
                 })}
             </div>
 
-            <div className='flex justify-center mt-30'>
+            <Link to="posts/" className='flex justify-center mt-30'>
                 <button className='rounded-lg bg-red-400 text-white p-[10px] text-[15px] px-[15px] cursor-pointer w-[150px] mb-20 mx-auto'>MORE POST</button>
-            </div>
+            </Link>
         </div>
     )
 }

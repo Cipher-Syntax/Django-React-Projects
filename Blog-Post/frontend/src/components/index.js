@@ -4,6 +4,7 @@ import HeroSection from "./HeroSection";
 import Cards from "./Cards";
 import Form from './Form'
 import LoadingIndicator from "./LoadingIndicator";
+import Filter from "./Filter";
 
 export {
     Header,
@@ -12,4 +13,5 @@ export {
     Cards,
     Form,
     LoadingIndicator,
+    Filter,
 }

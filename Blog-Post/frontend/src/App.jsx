@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Register, Login, Home, NotFound, CreatePost, PostDetail } from './pages'
+import { Register, Login, Home, NotFound, CreatePost, PostDetail, Posts } from './pages'
 import ProtectedRoute from './components/ProtectedRoute'
 
 const Logout = () => {
@@ -35,6 +35,12 @@ const App = () => {
           <Route path='posts/:id/' element={
             <ProtectedRoute>
               <PostDetail></PostDetail>
+            </ProtectedRoute>}>
+          </Route>
+
+          <Route path='posts/' element={
+            <ProtectedRoute>
+              <Posts></Posts>
             </ProtectedRoute>}>
           </Route>
         </Routes>
