@@ -68,7 +68,7 @@ const PostDetail = () => {
             </div>
 
             <form className='mt-[20px] transition-all duration-[0.2s] ease-in-out mb-[50px]' onSubmit={handleSubmit}>
-                <textarea name="comment_input" value={comment} onChange={(e) => setComment(e.target.value)} onFocus={() => setIsFocused(true)} id="comment-input" placeholder='Comment here...' className={`w-full rounded-[20px] pt-2 px-4 outline-0 border transition-all duration-300
+                <textarea value={comment} onChange={(e) => setComment(e.target.value)} onFocus={() => setIsFocused(true)} placeholder='Comment here...' className={`w-full rounded-[20px] pt-2 px-4 outline-0 border transition-all duration-300 text-[12px]
                         ${isFocused ? "h-[100px]" : "h-[40px]"}`}></textarea>
 
                 {isFocused && (
