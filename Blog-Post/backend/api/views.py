@@ -38,14 +38,18 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-        
-    
-    
 
 class LikeViewSet(viewsets.ModelViewSet):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_queryset(self):
+        post_id = self.request.query_params.get('post_id')
+        
+        if post_id:
+            return Like.objects.filter(post__id=post_id)
+        return Like.objects.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
