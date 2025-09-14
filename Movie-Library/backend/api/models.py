@@ -11,6 +11,7 @@ class Genre(models.Model):
 class Movie(models.Model):
     title = models.CharField(max_length=250)
     description = models.TextField()
+    image = models.FileField(upload_to="movie_image/")
     genres = models.ManyToManyField(Genre, related_name='movies')
     created_at = models.DateTimeField(auto_now_add=True)
     
