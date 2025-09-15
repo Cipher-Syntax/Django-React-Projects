@@ -3,6 +3,7 @@ import api from "../api/api"
 import { useNavigate } from "react-router-dom"
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants'
 import { LoadingIndicator } from "../components"
+import { jwtDecode } from 'jwt-decode'
 
 const Form = ({ route, method }) => {
     const [username, setUsername] = useState('')
@@ -26,35 +27,35 @@ const Form = ({ route, method }) => {
 
             localStorage.setItem(ACCESS_TOKEN, response.data.access)
             localStorage.setItem(REFRESH_TOKEN, response.data.refresh)
+            localStorage.setItem('username', username)
             navigate("/")
         } 
-        catch (error) {
+        catch(error){
             if (error.response) {
-                if (error.response.status === 400) {
-                    const errorDetail = error.response.detail
+                if (error.response.status === 401) {
+                    const errorDetail = err.response.data.detail;
                     if (errorDetail === "No active account found with the given credentials") {
-                        setError("Invalid username or password")
+                        setError("Invalid username or password.");
                     } 
                     else {
-                        console.error(errorDetail);
+                        alert(errorDetail);
                     }
                 } 
-                else if (error.response.status === 401) {
-                    if (error.response.username) {
-                        setError(error.response.data.username[0])
+                else if (error.response.status === 400) {
+                    if (error.response.data.username) {
+                        setError(error.response.data.username[0]);
                     } 
                     else {
-                        setError("Invalid input. Check username and password")
+                        setError("Invalid input. Check your username and password.")
                     }
                 } 
                 else {
-                    setError("Something went wrong")
+                    setError("Something went wrong.");
                 }
-            } 
-            else {
-                setError("Network error. Please check your connection")
+            } else {
+                setError("Network error. Please check your connection.");
             }
-        } 
+        }
         finally {
             setLoading(false)
         }
