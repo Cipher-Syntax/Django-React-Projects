@@ -32,7 +32,7 @@ const Form = ({ route, method }) => {
         catch(error){
             if (error.response) {
                 if (error.response.status === 401) {
-                    const errorDetail = err.response.data.detail;
+                    const errorDetail = error.response.data.detail;
                     if (errorDetail === "No active account found with the given credentials") {
                         setError("Invalid username or password.");
                     } 
