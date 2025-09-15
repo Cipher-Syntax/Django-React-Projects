@@ -1,8 +1,13 @@
 import React from 'react'
+import { Header, HeroSection, MovieCard } from '../components'
 
 const Home = () => {
     return (
-        <div>Home</div>
+        <>
+            <Header></Header>
+            {/* <HeroSection></HeroSection> */}
+            <MovieCard></MovieCard>
+        </>
     )
 }
 
