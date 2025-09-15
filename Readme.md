@@ -22,7 +22,7 @@
 🔑 Skill: Relational models, likes/comments with React.
 
 ### Movie/Book Library
- - Django: API with search & filtering (e.g., by genre/author).
+ - Django: API with search & filtering (e.g., by genre/title).
  - React: Search bar, sort results, pagination.
 🔑 Skill: API query parameters + front-end state management.
 
