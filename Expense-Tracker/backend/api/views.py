@@ -17,8 +17,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Expense.objects.filter(user=user)
-        start_date = self.request.query_params('start_date')
-        end_date = self.request.query_params('end_date')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
         
         if start_date and end_date:
             queryset = Expense.objects.filter(start_date__gte=start_date, end_date__lte=end_date)
