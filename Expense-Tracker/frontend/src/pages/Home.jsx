@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { AddExpenses, ExpenseChart, ExpenseFilters, ExpenseList, ExpensePieChart } from '../components'
+import { ExpenseChart, ExpenseFilters, ExpenseList, ExpensePieChart } from '../components'
 import { useFetchExpenses } from '../hooks'
 
 const Home = () => {
@@ -12,9 +12,12 @@ const Home = () => {
 
     return (
         <>
-            <ExpenseChart expenses={filteredExpenses} />
-            <ExpensePieChart expenses={filteredExpenses}></ExpensePieChart>
-            <AddExpenses></AddExpenses>
+            <h1 className='text-center font-bold text-3xl my-5 tracking-widest'>Expense Tracker</h1>
+            <div className='flex justify-center items-center my-20 px-40'>
+                <ExpensePieChart expenses={filteredExpenses}></ExpensePieChart>
+                <ExpenseChart expenses={filteredExpenses} />    
+            </div>
+            
             <ExpenseFilters setExpenses={setFilteredExpenses} />
             <ExpenseList expenses={filteredExpenses} />
         </>

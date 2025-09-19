@@ -36,7 +36,7 @@ const ExpenseChart = ( {expenses }) => {
     }
 
     return (
-        <div style={{ width: "500px", margin: "0 auto" }}>
+        <div style={{ width: "600px", margin: "0 auto" }}>
             <Bar data={chartData} options={chartOptions} />
         </div>
     )

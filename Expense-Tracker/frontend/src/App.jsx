@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Register, Login, Home, NotFound } from './pages'
-import { ProtectedRoute } from './components'
+import { AddExpenses, ProtectedRoute } from './components'
 
 const Logout =  () => {
     localStorage.removeItem('access');
@@ -27,6 +27,12 @@ const App = () => {
                 <Route path='/' element={
                     <ProtectedRoute>
                         <Home></Home>
+                    </ProtectedRoute>
+                }>
+                </Route>
+                <Route path='/add_expenses' element={
+                    <ProtectedRoute>
+                        <AddExpenses></AddExpenses>
                     </ProtectedRoute>
                 }>
                 </Route>

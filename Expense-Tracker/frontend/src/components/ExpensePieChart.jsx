@@ -42,7 +42,7 @@ const ExpensePieChart = ({ expenses }) => {
     }
 
     return (
-        <div style={{ width: "250px", margin: "0 auto" }}>
+        <div style={{ width: "400px", margin: "0 auto" }}>
             <Pie data={chartData} options={chartOptions} />
         </div>
     )
