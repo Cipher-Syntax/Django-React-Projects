@@ -18,21 +18,24 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Expense.objects.filter(user=user)
+
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date')
-        
-        if start_date and end_date:
+        category = self.request.query_params.get('category')
+
+        if start_date:
             start = parse_date(start_date)
+            queryset = queryset.filter(start_date__gte=start)
+
+        if end_date:
             end = parse_date(end_date)
-            queryset = Expense.objects.filter(start_date__gte=start, end_date__lte=end)
-        elif start_date:
-            start = parse_date(start_date)
-            queryset = Expense.objects.filter(start_date__gte=start)
-        elif end_date:
-            end = parse_date(end_date)
-            queryset = Expense.objects.filter(end_date__lte=end)
+            queryset = queryset.filter(end_date__lte=end)
+
+        if category:
+            queryset = queryset.filter(category=category)
 
         return queryset
+
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
