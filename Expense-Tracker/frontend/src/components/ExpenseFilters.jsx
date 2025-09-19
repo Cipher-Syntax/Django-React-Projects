@@ -10,14 +10,22 @@ const ExpenseFilters = ({ setExpenses }) => {
 
         try {
             let url = "api/expenses/"
-            if (startDate && endDate) {
-                url += `?start_date=${startDate}&end_date=${endDate}`
+            // if (startDate && endDate) {
+            //     url += `?start_date=${startDate}&end_date=${endDate}`
+            // }
+            // else if(startDate){
+            //     url += `?start_date=${startDate}`
+            // }
+            // else if(endDate){
+            //     url += `?end_date=${endDate}`
+            // }
+
+            if (startDate) {
+                url += `?start_date=${startDate}`;
             }
-            else if(startDate){
-                url += `?start_date=${startDate}`
-            }
-            else if(endDate){
-                url += `?end_date=${endDate}`
+            
+            if (endDate) {
+                url += `${startDate ? '&' : '?'}end_date=${endDate}`
             }
 
             const response = await api.get(url)
