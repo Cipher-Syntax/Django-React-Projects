@@ -6,8 +6,10 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const ExpenseChart = ( {expenses }) => {
-    // const { expenses } = useFetchExpenses()
     
+    if(expenses.length === 0){
+        return <p>No expenses to display</p>
+    }
     const chartData = {
         labels: expenses.map((e) => e.title),
         datasets: [
@@ -33,11 +35,11 @@ const ExpenseChart = ( {expenses }) => {
         
     }
 
-     return (
-        <div style={{ width: "600px", margin: "0 auto" }}>
+    return (
+        <div style={{ width: "500px", margin: "0 auto" }}>
             <Bar data={chartData} options={chartOptions} />
         </div>
-     )
+    )
 }
 
 export default ExpenseChart
