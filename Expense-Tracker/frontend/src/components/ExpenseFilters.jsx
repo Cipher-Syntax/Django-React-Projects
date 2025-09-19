@@ -20,11 +20,17 @@ const ExpenseFilters = ({ setExpenses }) => {
             //     url += `?end_date=${endDate}`
             // }
 
+            // check if startdate exist
             if (startDate) {
+                // starting url query
                 url += `?start_date=${startDate}`;
             }
-            
+
+            // check if enddate exist
             if (endDate) {
+                // check if startdate exist: 
+                // if exist, add & then merge 'end_date' url query
+                // else, start new url query via ?
                 url += `${startDate ? '&' : '?'}end_date=${endDate}`
             }
 
