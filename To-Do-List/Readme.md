@@ -26,3 +26,9 @@ It allows users to **add tasks, view tasks, mark them as completed, and delete t
 - TailwindCSS (optional, for styling)
 
 ---
+
+## Django Installation ##
+- pip install -r requirements.txt
+
+## React Installation ##
+- npm install / npm i
