@@ -27,3 +27,9 @@ It allows users to **search and filter movies** - demonstrating **API query para
 - TailwindCSS (optional, for styling)  
 
 ---
+
+## Django Installation ##
+- pip install -r requirements.txt
+
+## React Installation ##
+- npm install / npm i
