@@ -48,3 +48,8 @@ Authentication is implemented with **protected routes**, ensuring only logged-in
 - Axios for API calls  
 
 ---
+## Django Installation ##
+- pip install -r requirements.txt
+
+## React Installation ##
+- npm install / npm i
