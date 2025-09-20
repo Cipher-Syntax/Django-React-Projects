@@ -29,3 +29,9 @@ It allows users to **create posts, filter posts by category, like/unlike posts, 
 - TailwindCSS (optional, for styling)  
 
 ---
+
+## Django Installation ##
+- pip install -r requirements.txt
+
+## React Installation ##
+- npm install / npm i
