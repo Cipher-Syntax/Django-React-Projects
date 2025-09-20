@@ -29,3 +29,9 @@ A simple Notes application built with **Django** (backend) and **React** (fronte
 - **Authentication:** JWT tokens stored in localStorage
 
 ---
+
+## Django Installation ##
+- pip install -r requirements.txt
+
+## React Installation ##
+- npm install / npm i
