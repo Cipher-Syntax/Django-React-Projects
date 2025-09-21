@@ -1,6 +1,7 @@
 from rest_framework import serializers #type: ignore
 from .models import Expense
 from django.contrib.auth.models import User
+import bleach
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,3 +23,6 @@ class ExpenseSerializer(serializers.ModelSerializer):
         model = Expense
         fields = ['user', 'title', 'amount', 'category', 'start_date', 'end_date', 'created_at']
         read_only_fields = ['user']
+        
+        def validate_title(self, value):
+            return bleach.clean(value, tags=[], strip=True)  # strips scripts/tags
