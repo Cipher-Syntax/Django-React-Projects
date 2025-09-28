@@ -1,8 +1,9 @@
 import React from 'react'
+import { Form } from '../components'
 
 const Login = () => {
     return (
-        <div>Login</div>
+        <Form route="api/token/" method="login"></Form>
     )
 }
 
