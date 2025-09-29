@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FaOpencart } from "react-icons/fa";
 import api from "../api/api";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants/constants";
@@ -11,12 +11,12 @@ const Form = ({ route, method }) => {
     const navigate = useNavigate();
     const status = method === "login" ? "Login" : "Register";
 
-    const timer = setTimeout(() => {
-        setError("");
-        clearTimeout(timer)
-    }, 2000)
-
-    
+    useEffect(() => {
+        if (error){
+            const timer = setTimeout(() => setTimeout(() => setError("")), 2000)
+            return () => clearTimeout(timer)
+        }
+    }, [error])
 
     const onSubmit = async (data) => {
         try {
@@ -65,7 +65,7 @@ const Form = ({ route, method }) => {
                 </h1>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white shadow-2xl rounded-2xl w-[350px] md:w-[400px] p-8 flex flex-col gap-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="shadow-2xl rounded-2xl w-[350px] md:w-[400px] p-8 flex flex-col gap-6">
                 <div className="flex items-center justify-center gap-3 mb-4">
                     <FaOpencart className="text-3xl text-blue-600" />
                     <h2 className="text-2xl font-bold text-gray-800">{status}</h2>
@@ -129,16 +129,12 @@ const Form = ({ route, method }) => {
                 {method === "login" ? (
                     <p className="text-sm text-center text-gray-600">
                         Don’t have an account?{" "}
-                        <a href="/register" className="text-blue-600 font-medium hover:underline">
-                        Register
-                        </a>
+                        <Link to="/register" className="text-blue-600 font-medium hover:underline">Register</Link>
                     </p>
                 ) : (
                     <p className="text-sm text-center text-gray-600">
                         Already have an account?{" "}
-                        <a href="/login" className="text-blue-600 font-medium hover:underline">
-                        Login
-                        </a>
+                        <Link to="/login" className="text-blue-600 font-medium hover:underline">Login</Link>
                     </p>
                 )}
             </form>

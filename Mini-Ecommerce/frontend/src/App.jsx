@@ -3,25 +3,21 @@ import { ProtectedRoute } from './components'
 import { Register, Login, Home, NotFound } from './pages'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
-const Logout = () => {
+
+const clearAuth = () => {
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
-
-    return <Navigate to="/login"></Navigate>
 }
-
-const RegisterAndLogout = () => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
-
-    return <Register></Register>
+const Logout = () => {
+    clearAuth();
+    return <Navigate to="/login"></Navigate>
 }
 
 const App = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path='/register' element={ <RegisterAndLogout></RegisterAndLogout>}></Route>
+                <Route path='/register' element={<Register></Register>}></Route>
                 <Route path='/login' element={<Login></Login>}></Route>
                 <Route path='/logout' element={<Logout></Logout>}></Route>
                 <Route path='/' element={
