@@ -4,7 +4,7 @@ import { DealsOfTheDay, Header, ProductCarousel, Products, Footer } from '../com
 const Home = () => {
     return (
         <>
-            {/* <Header></Header> */}
+            <Header></Header>
             <ProductCarousel></ProductCarousel>
             <Products></Products>
             <DealsOfTheDay></DealsOfTheDay>

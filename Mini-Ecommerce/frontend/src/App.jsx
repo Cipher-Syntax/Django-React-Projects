@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Products, ProtectedRoute } from './components'
+import { Products, ProtectedRoute } from './components'
 import { Register, Login, Home, NotFound, ProductDetails, ProductCart } from './pages'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
@@ -16,7 +16,6 @@ const Logout = () => {
 const App = () => {
     return (
         <BrowserRouter>
-            <Header></Header>
             <Routes>
                 <Route path='/register' element={<Register></Register>}></Route>
                 <Route path='/login' element={<Login></Login>}></Route>

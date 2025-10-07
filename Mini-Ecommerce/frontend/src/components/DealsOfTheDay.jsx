@@ -26,46 +26,49 @@ const DealsOfTheDay = () => {
                 </div>
 
                 <div className='w-full lg:w-2/5'>
-                    <Slide
-                        duration={3000}
-                        transitionDuration={800} 
-                        infinite={true}
-                        indicators={true} 
-                        slidesToShow={3}
-                        arrows={true} 
-                        autoplay={true}
-                        easing="ease"
-                    >
-                        {
-                            deals?.products?.length > 0 ? (
-                                deals?.products?.map((deal) => (
+                    {deals?.products?.length > 0 ? (
+                        <Slide
+                            duration={3000}
+                            transitionDuration={800} 
+                            infinite={true}
+                            indicators={true} 
+                            slidesToShow={3}
+                            arrows={true} 
+                            autoplay={true}
+                            easing="ease"
+                        >
+                            {
+                                deals.products.map((deal) => (
                                     <div key={deal.id} className="px-2">
                                         <Link
-                                            to={`/products/${deal.id}`}
-                                            className='w-full h-[280px] bg-white shadow-2xl rounded-md flex flex-col items-center justify-center cursor-pointer'
+                                        to={`/products/${deal.id}`}
+                                        className='w-[150px] h-[280px] bg-white shadow-2xl rounded-md flex flex-col items-center justify-center cursor-pointer'
                                         >
-                                            <img 
-                                                src={deal.image}
-                                                alt={deal.name}
-                                                className='w-[85%] h-[150px] object-cover rounded-sm'
-                                            />
-                                            <h5 className='text-[14px] mt-4 text-gray-800 text-center font-semibold'>
-                                                {deal.name.slice(0, 15)}...
-                                            </h5>
-                                            <p className='text-gray-400 text-[10px] px-3 text-center mt-1 line-clamp-2'>
-                                                {deal.description.slice(0, 40)}...
+                                        <img 
+                                            src={deal.image}
+                                            alt={deal.name}
+                                            className='w-[85%] h-[150px] object-cover rounded-sm'
+                                        />
+                                        <h5 className='text-[14px] mt-4 text-gray-800 text-center font-semibold'>
+                                            {deal.name.slice(0, 15)}...
+                                        </h5>
+                                        <p className='text-gray-400 text-[10px] px-3 text-center mt-1 line-clamp-2'>
+                                            {deal.description.slice(0, 40)}...
+                                        </p>
+                                        <div className='flex items-center justify-end w-full px-3 mt-3 text-[12px]'>
+                                            <p className='font-semibold text-red-500'>
+                                            ₱ {Number(deal.price || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </p>
-                                            <div className='flex items-center justify-end w-full px-3 mt-3 text-[12px]'>
-                                                <p className='font-semibold text-red-500'>₱ {deal.price}</p>
-                                            </div>
+                                        </div>
                                         </Link>
                                     </div>
                                 ))
-                            ) : (
-                                <LoadingIndicator></LoadingIndicator>
-                            )
-                        }
-                    </Slide>
+                            }
+                        </Slide>
+                     ) : (
+                        <LoadingIndicator></LoadingIndicator>
+                    )}
+
                 </div>
             </div>
         </section>
