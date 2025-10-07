@@ -1,6 +1,6 @@
 from rest_framework import serializers #type: ignore
 from django.contrib.auth.models import User
-from .models import Product, Order, OrderItem, DailyDeal
+from .models import Product, Order, OrderItem, DailyDeal, Payment
 from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
@@ -80,4 +80,10 @@ class DailyDealSerializer(serializers.ModelSerializer):
         model = DailyDeal
         fields = ['id', 'date', 'products']
 
-
+class PaymentSerializer(serializers.ModelSerializer):
+    order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
+    
+    class Meta:
+        model = Payment
+        fields = ['id', 'order', 'paymongo_payment_id', 'amount', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'status', 'created_at', 'updated_at']

@@ -150,3 +150,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '/media/')
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=Csv())
+
+
+# PayMongo keys
+PAYMONGO_ENV = config('PAYMONGO_ENV', default='test')
+
+if PAYMONGO_ENV == 'test':
+    PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_TEST')
+    PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_TEST')
+else:
+    PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_LIVE')
+    PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_LIVE')

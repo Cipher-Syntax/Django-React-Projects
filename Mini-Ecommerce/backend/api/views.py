@@ -1,12 +1,19 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, generics, permissions  # type: ignore
-from .models import Category, Product, Order, OrderItem, DailyDeal
+from .models import Category, Product, Order, OrderItem, DailyDeal, Payment
 from .serializers import UserSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer, DailyDealSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, SAFE_METHODS, BasePermission  # type: ignore
 from datetime import date
 from rest_framework.decorators import api_view, permission_classes  # type: ignore
 from rest_framework.response import Response  # type: ignore
 import random
+import requests
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+import json
+
 
 # ---------- USER ----------
 class CreateUser(generics.CreateAPIView):
@@ -121,3 +128,83 @@ def cart_item_count(request):
     
     total_count = OrderItem.objects.filter(order__user=user).count()
     return Response({'count': total_count})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_gcash_payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user, status='Pending')
+
+    import base64
+    secret_key = settings.PAYMONGO_SECRET_KEY
+    token = base64.b64encode(f"{secret_key}:".encode()).decode()
+
+    headers = {
+        'Authorization': f'Basic {token}',
+        'Content-Type': 'application/json'
+    }
+
+    frontend_base_url = "https://abcd1234.ngrok.io"  # replace with your ngrok URL
+    success_url = f"{frontend_base_url}/payment-success/{order.id}"
+    failed_url = f"{frontend_base_url}/payment-failed/{order.id}"
+
+    data = {
+        "data": {
+            "attributes": {
+                "amount": int(order.total_price * 100),
+                "currency": "PHP",
+                "payment_method_allowed": ["gcash"],
+                "payment_method_options": {
+                    "gcash": {
+                        "success_url": success_url,
+                        "failed_url": failed_url
+                    }
+                },
+                "description": f"Order #{order.id} Payment"
+            }
+        }
+    }
+
+    response = requests.post('https://api.paymongo.com/v1/payment_intents', json=data, headers=headers)
+    result = response.json()
+
+    if response.status_code not in [200, 201]:
+        return Response({"error": result}, status=400)
+
+    pi_id = result['data']['id']
+    checkout_url = result['data']['attributes']['next_action']['redirect']['url']
+
+    payment, created = Payment.objects.get_or_create(
+        order=order,
+        defaults={'paymongo_payment_id': pi_id, 'amount': order.total_price, 'status': 'Pending', 'checkout_url': checkout_url}
+    )
+
+    return Response({
+        "payment_id": payment.id,
+        "checkout_url": payment.checkout_url
+    })
+
+    
+@csrf_exempt
+@api_view(['POST'])
+def paymongo_webhook(request):
+    payload = json.loads(request.body)
+    
+    event_type = payload['data']['attributes']['type']
+    
+    if event_type == "payment_intent.updated":
+        pi_id = payload['data']['id']
+        payment_status = payload['data']['attributes']['status']
+        
+        try:
+            payment = Payment.objects.get(paymongo_payment_id=pi_id)
+            payment.status = 'Paid' if payment_status == "succeeded" else 'Failed'
+            payment.save()
+            
+            if payment.status == "Paid":
+                order = payment.order
+                order.status = "Completed"
+                order.save()
+            
+        except Payment.DoesNotExist:
+            pass
+    return JsonResponse({"status": "success"})

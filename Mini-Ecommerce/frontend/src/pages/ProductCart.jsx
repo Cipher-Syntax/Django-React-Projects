@@ -4,6 +4,7 @@ import { FaTrashAlt } from "react-icons/fa"
 import { Link } from 'react-router-dom';
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { Header } from '../components';
+import api from '../api/api';
 
 const ProductCart = () => {
     const { orders, updateOrderItem, deleteOrderItem } = useFetchOrders()
@@ -39,6 +40,37 @@ const ProductCart = () => {
             console.error('Error deleting item:', error)
         }
     }
+
+    const handleCheckout = async () => {
+        if (selectedItems.length === 0) {
+            alert("Please select at least one item to checkout!");
+            return;
+        }
+
+        try {
+            // Assume all selected items belong to the same pending order
+            const orderId = orders.find(order => 
+                order.items.some(item => selectedItems.some(sel => sel.id === item.id))
+            ).id;
+
+            const response = await api.post(`api/payment/create/${orderId}/`, {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`, // if using token auth
+                    },
+                }
+            );
+
+            // Redirect user to PayMongo checkout page
+            window.location.href = response.data.checkout_url;
+
+        } catch (error) {
+            console.error("Error creating payment:", error);
+            alert("Failed to initiate payment. Please try again.");
+        }
+    };
+
+
 
     useEffect(() => {
         const totalAmount = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
@@ -128,7 +160,7 @@ const ProductCart = () => {
                                 <span className="font-bold text-blue-600 text-lg">₱ {total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </div>
                         </div>
-                        <button className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                        <button onClick={handleCheckout} className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
                             Checkout
                         </button>
                     </div>
