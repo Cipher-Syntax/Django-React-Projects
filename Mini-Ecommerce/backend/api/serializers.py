@@ -1,6 +1,6 @@
 from rest_framework import serializers #type: ignore
 from django.contrib.auth.models import User
-from .models import Product, Order, OrderItem
+from .models import Product, Order, OrderItem, DailyDeal
 from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,10 +25,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'price', 'image', 'category']
+    
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image:
+            return request.build_absolute_uri(obj.image.url)
+        return None
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -65,4 +72,12 @@ class OrderSerializer(serializers.ModelSerializer):
         order.total_price = total
         order.save()
         return order
+
+class DailyDealSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = DailyDeal
+        fields = ['id', 'date', 'products']
+
 

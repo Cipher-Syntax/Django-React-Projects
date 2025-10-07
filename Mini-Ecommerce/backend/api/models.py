@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # Create your models here.
 class Category(models.Model):
@@ -32,5 +33,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
 
-
+class DailyDeal(models.Model):
+    date = models.DateField(default=timezone.now)
+    products = models.ManyToManyField(Product)
 

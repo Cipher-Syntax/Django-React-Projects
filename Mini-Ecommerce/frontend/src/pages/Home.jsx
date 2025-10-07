@@ -1,8 +1,15 @@
 import React from 'react'
+import { DealsOfTheDay, Header, ProductCarousel, Products, Footer } from '../components'
 
 const Home = () => {
     return (
-        <div>Home</div>
+        <>
+            {/* <Header></Header> */}
+            <ProductCarousel></ProductCarousel>
+            <Products></Products>
+            <DealsOfTheDay></DealsOfTheDay>
+            <Footer></Footer>
+        </>
     )
 }
 
