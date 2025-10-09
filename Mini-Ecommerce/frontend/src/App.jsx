@@ -1,6 +1,6 @@
 import React from 'react'
 import { Products, ProtectedRoute } from './components'
-import { Register, Login, Home, NotFound, ProductDetails, ProductCart } from './pages'
+import { Register, Login, Home, NotFound, ProductDetails, ProductCart, PaymentSuccess, PaymentFailed } from './pages'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 
@@ -17,6 +17,8 @@ const App = () => {
     return (
         <BrowserRouter>
             <Routes>
+                <Route path="/payment-success" element={<PaymentSuccess></PaymentSuccess>} />
+                <Route path="/payment-failed" element={<PaymentFailed></PaymentFailed>} />
                 <Route path='/register' element={<Register></Register>}></Route>
                 <Route path='/login' element={<Login></Login>}></Route>
                 <Route path='/logout' element={<Logout></Logout>}></Route>

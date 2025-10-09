@@ -7,10 +7,12 @@ const usefetchOrders = () => {
     useEffect(() => {
         const fetchOrders = async () => {
             const response = await api.get('api/orders/');
-            setOrders(response.data)
-        }
+            const pendingOrders = response.data.filter(order => order.status === 'Pending');
+            setOrders(pendingOrders);
+        };
         fetchOrders();
-    }, [])
+    }, []);
+
 
     const updateOrderItem = async (itemId, data) => {
         await api.patch(`api/order-items/${itemId}/`, data);

@@ -156,8 +156,20 @@ CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=Csv())
 # PAYMONGO_ENV = config('PAYMONGO_ENV', default='test')
 # PAYMONGO_URL = config('PAYMONGO_URL', default='https://api.paymongo.com/v1/payment_intents')
 
-# PAYMONGO_PUBLIC_KEY_TEST = config('PAYMONGO_PUBLIC_KEY_TEST', default='')
-# PAYMONGO_SECRET_KEY_TEST = config('PAYMONGO_SECRET_KEY_TEST', default='')
+# Paymongo configuration
 
-# PAYMONGO_PUBLIC_KEY_LIVE = config('PAYMONGO_PUBLIC_KEY_LIVE', default='')
-# PAYMONGO_SECRET_KEY_LIVE = config('PAYMONGO_SECRET_KEY_LIVE', default='')
+
+
+
+PAYMONGO_BASE_URL = config('PAYMONGO_BASE_URL', default='https://api.paymongo.com/v1')
+PAYMONGO_MODE = config('PAYMONGO_MODE', default='test')
+
+if PAYMONGO_MODE == "live":
+    PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_LIVE', default='')
+    PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_LIVE', default='')
+else:
+    PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_TEST', default='')
+    PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_TEST', default='')
+
+
+print(f"🧾 PayMongo Mode: {PAYMONGO_MODE.upper()}") 

@@ -42,6 +42,34 @@ const ProductCart = () => {
         }
     }
 
+    const handleCheckout = async () => {
+        if (selectedItems.length === 0) {
+            alert("Please select at least one item to checkout.");
+            return;
+        }
+
+        try {
+            const selectedItemIds = selectedItems.map(item => item.id);
+            const selectedTotal = selectedItems.reduce(
+                (sum, item) => sum + item.price * item.quantity,
+                0
+            );
+
+            const response = await api.post('api/payments/create-intent/', {
+                selected_item_ids: selectedItemIds,
+            });
+
+            const { checkout_url } = response.data;
+            window.location.href = checkout_url;
+        } catch (error) {
+            console.error('Error creating payment intent:', error);
+            alert("Failed to start GCash payment.");
+        }
+    };
+
+
+
+
 
     useEffect(() => {
         const totalAmount = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
@@ -131,8 +159,8 @@ const ProductCart = () => {
                                 <span className="font-bold text-blue-600 text-lg">₱ {total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             </div>
                         </div>
-                        <button className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                            Checkout
+                        <button onClick={handleCheckout} className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                            Pay With Gcash
                         </button>
                     </div>
                 </div>

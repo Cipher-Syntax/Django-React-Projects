@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { IoCartOutline } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
-import api from '../api/api';
 import { Link, useSearchParams } from 'react-router-dom';
+import api from '../api/api';
 
 const Header = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -48,15 +48,20 @@ const Header = () => {
                 </div>
             </div>
 
-            <Link  to="/cart"  className='relative flex items-center' title="Go to Cart"
-            >
-                <IoCartOutline size={25} className='text-blue-500'></IoCartOutline>
-                {cartCount > 0 && (
-                    <span className='absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold'>
-                        {cartCount}
-                    </span>
-                )}
-            </Link>
+            <div className='flex items-center gap-4'>
+                <Link to="/cart" className='relative flex items-center' title="Go to Cart">
+                    <IoCartOutline size={25} className='text-blue-500'></IoCartOutline>
+                    {cartCount > 0 && (
+                        <span className='absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold'>
+                            {cartCount}
+                        </span>
+                    )}
+                </Link>
+                
+                <Link to="/logout" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-lg font-semibold transition">
+                    Logout
+                </Link>
+            </div>
 
         </header>    
     );
