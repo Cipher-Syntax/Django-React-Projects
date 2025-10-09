@@ -57,7 +57,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        status_filter = self.request.query_params.get('status')  # 👈 optional ?status=Pending
+        status_filter = self.request.query_params.get('status')
 
         queryset = Order.objects.filter(user=user)
 
@@ -89,7 +89,7 @@ def daily_deal(request):
     return Response(serializer.data)
 
 
-# ---------- 🛒 ADD TO CART ----------
+# ---------- ADD TO CART ----------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_to_cart(request):
@@ -99,26 +99,22 @@ def add_to_cart(request):
 
     product = get_object_or_404(Product, id=product_id)
 
-    # 1. Find or create a pending order for this user
     order, created = Order.objects.get_or_create(
         user=request.user,
         status='Pending',
         defaults={'total_price': 0}
     )
 
-    # 2. Check if product already exists in the cart
     order_item, created_item = OrderItem.objects.get_or_create(
         order=order,
         product=product,
         defaults={'quantity': quantity, 'price': product.price}
     )
 
-    # 3. Update quantity if item already exists
     if not created_item:
         order_item.quantity += quantity
         order_item.save()
 
-    # 4. Update total price
     order.total_price = sum(item.quantity * item.price for item in order.items.all())
     order.save()
 
@@ -129,17 +125,17 @@ def add_to_cart(request):
     })
 
 
+# ----------  COUNT CART ----------
 @api_view(['GET'])
 def cart_item_count(request):
     user = request.user
     if not user.is_authenticated:
         return Response({'count': 0})
 
-    # ✅ Count only items in Pending orders
     total_count = OrderItem.objects.filter(order__user=user, order__status='Pending').count()
     return Response({'count': total_count})
 
-
+# ---------- PAYMENT INTENT ----------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_payment_intent(request):
@@ -149,12 +145,10 @@ def create_payment_intent(request):
     if not selected_item_ids:
         return Response({'error': 'No items selected'}, status=400)
 
-    # Fetch the selected items
     items = OrderItem.objects.filter(id__in=selected_item_ids, order__user=user, order__status='Pending')
     if not items.exists():
         return Response({'error': 'Selected items not found'}, status=404)
 
-    # Create a temporary order for the selected items
     temp_order = Order.objects.create(user=user, status='Pending', total_price=0)
     for item in items:
         item.order = temp_order
@@ -163,9 +157,7 @@ def create_payment_intent(request):
     temp_order.total_price = sum(item.quantity * item.price for item in items)
     temp_order.save()
 
-    amount = int(temp_order.total_price * 100)  # convert to centavos
-
-    # PayMongo API setup
+    amount = int(temp_order.total_price * 100)
     secret_key = settings.PAYMONGO_SECRET_KEY
     auth_token = base64.b64encode(f"{secret_key}:".encode()).decode()
     headers = {
@@ -192,10 +184,10 @@ def create_payment_intent(request):
         payment_intent_id = data["data"]["id"]
         client_key = data["data"]["attributes"]["client_key"]
 
-        # Create GCash payment method
         pm_response = requests.post(f"{settings.PAYMONGO_BASE_URL}/payment_methods",
-                                    headers=headers,
-                                    json={"data": {"attributes": {"type": "gcash"}}})
+            headers=headers,
+            json={"data": {"attributes": {"type": "gcash"}}})
+        
         pm_data = pm_response.json()
         payment_method_id = pm_data["data"]["id"]
 
@@ -215,7 +207,6 @@ def create_payment_intent(request):
         attach_data = attach_response.json()
         checkout_url = attach_data["data"]["attributes"]["next_action"]["redirect"]["url"]
 
-        # Save payment record
         Payment.objects.create(
             order=temp_order,
             paymongo_payment_id=payment_intent_id,
@@ -233,7 +224,7 @@ def create_payment_intent(request):
 
     return Response(data, status=response.status_code)
 
-
+# ---------- PAYMENT WEBHOOK ----------
 @csrf_exempt
 def paymongo_webhook(request):
     if request.method != "POST":
