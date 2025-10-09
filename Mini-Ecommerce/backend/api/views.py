@@ -93,7 +93,6 @@ def daily_deal(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_to_cart(request):
-    """Handles adding a product to the user's cart (Pending order)."""
     product_id = request.data.get('product_id')
     quantity = int(request.data.get('quantity', 1))
 
