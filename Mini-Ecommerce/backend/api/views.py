@@ -30,6 +30,16 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 # ---------- ORDER ITEM ----------
+# class OrderItemViewSet(viewsets.ModelViewSet):
+#     queryset = OrderItem.objects.all()
+#     serializer_class = OrderItemSerializer
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+#     def get_queryset(self):
+#         user = self.request.user
+#         queryset = OrderItem.objects.filter(order__user=user)
+#         return queryset
+# ---------- ORDER ITEM ----------
 class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
@@ -39,6 +49,18 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = OrderItem.objects.filter(order__user=user)
         return queryset
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()  # get the OrderItem
+        order = instance.order        # get the parent Order
+        self.perform_destroy(instance)  # delete the OrderItem
+
+        # If the order has no more items, delete the order as well
+        if order.items.count() == 0:
+            order.delete()
+
+        return Response(status=204)
+
 
 
 # ---------- PERMISSION ----------
@@ -109,6 +131,13 @@ def add_to_cart(request):
         product=product,
         defaults={'quantity': quantity, 'price': product.price}
     )
+    # order_item = OrderItem.objects.create(
+    #     order=order,
+    #     product=product,
+    #     quantity=quantity,
+    #     price=product.price
+    # )
+
 
     if not created_item:
         order_item.quantity += quantity
@@ -141,6 +170,7 @@ def create_payment_intent(request):
     user = request.user
     selected_item_ids = request.data.get('selected_item_ids', [])
     
+    
     if not selected_item_ids:
         return Response({'error': 'No items selected'}, status=400)
 
@@ -153,8 +183,18 @@ def create_payment_intent(request):
         item.order = temp_order
         item.save()
 
-    temp_order.total_price = sum(item.quantity * item.price for item in items)
-    temp_order.save()
+    # temp_order.total_price = sum(item.quantity * item.price for item in items)
+    # temp_order.save()
+
+    temp_order = Order.objects.create(user=user, status='Pending', total_price=0)
+    for item in items:
+        OrderItem.objects.create(
+            order=temp_order,
+            product=item.product,
+            quantity=item.quantity,
+            price=item.price
+        )
+
 
     amount = int(temp_order.total_price * 100)
     secret_key = settings.PAYMONGO_SECRET_KEY
