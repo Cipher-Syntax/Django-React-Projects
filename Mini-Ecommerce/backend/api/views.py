@@ -376,6 +376,8 @@ def create_payment_intent(request):
 
     # Create payment intent
     response = requests.post(f"{settings.PAYMONGO_BASE_URL}/payment_intents", headers=headers, json=payload)
+    # print(response.status_code, response.text)
+    print("PayMongo Response:", response.status_code, response.text)
     data = response.json()
 
     if "data" not in data:
