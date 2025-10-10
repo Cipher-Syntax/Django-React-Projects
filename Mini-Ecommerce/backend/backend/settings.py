@@ -167,13 +167,23 @@ CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=Csv())
 
 PAYMONGO_BASE_URL = config('PAYMONGO_BASE_URL', default='https://api.paymongo.com/v1')
 PAYMONGO_MODE = config('PAYMONGO_MODE', default='test')
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
 
 if PAYMONGO_MODE == "live":
     PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_LIVE', default='')
     PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_LIVE', default='')
+    PAYMONGO_RETURN_URL = config('PAYMONGO_RETURN_URL_LIVE', default=FRONTEND_URL)
 else:
     PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_TEST', default='')
     PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_TEST', default='')
+    PAYMONGO_RETURN_URL = config('PAYMONGO_RETURN_URL_TEST', default=FRONTEND_URL)
+
+# if PAYMONGO_MODE == "live":
+#     PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_LIVE', default='')
+#     PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_LIVE', default='')
+# else:
+#     PAYMONGO_PUBLIC_KEY = config('PAYMONGO_PUBLIC_KEY_TEST', default='')
+#     PAYMONGO_SECRET_KEY = config('PAYMONGO_SECRET_KEY_TEST', default='')
 
 
 print(f"🧾 PayMongo Mode: {PAYMONGO_MODE.upper()}") 

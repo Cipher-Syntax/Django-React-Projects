@@ -4,10 +4,11 @@ import { CiSearch } from "react-icons/ci";
 import { Link, useSearchParams } from 'react-router-dom';
 import api from '../api/api';
 
-const Header = () => {
+const Header = ({rerender}) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const q = searchParams.get('q') || '';
     const [cartCount, setCartCount] = useState(0);
+
 
     useEffect(() => {
         const fetchCartCount = async () => {
@@ -19,9 +20,7 @@ const Header = () => {
             }
         };
         fetchCartCount();
-        const interval = setInterval(fetchCartCount, 1000);
-        return () => clearInterval(interval);
-    }, []);
+    }, [rerender]);
 
     return (
         <header className='w-full px-10 lg:px-20 h-[70px] flex items-center justify-between shadow-lg bg-white sticky top-0 z-50'>

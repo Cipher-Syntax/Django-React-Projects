@@ -13,6 +13,7 @@ const ProductDetails = () => {
     const [error, setError] = useState(null)
     const [quantity, setQuantity] = useState(1)
     const [message, setMessage] = useState(false)
+    const [rerender, setRerender] = useState(0);
 
     const increaseAmount = () => {
         setQuantity(q => q + 1);
@@ -51,6 +52,7 @@ const ProductDetails = () => {
                 quantity: quantity
             })
             // alert('Product added to cart!')
+            setRerender(rerender + 1)
             setMessage(true)
             const timeout = setTimeout(() => {
                 setMessage(false);
@@ -70,7 +72,7 @@ const ProductDetails = () => {
 
     return (
         <>
-            <Header></Header>
+            <Header rerender={rerender}></Header>
             <div className='p-10'>
                 <Link to="/" className='flex gap-3 items-center text-2xl'>
                     <IoIosArrowRoundBack size={30}></IoIosArrowRoundBack>

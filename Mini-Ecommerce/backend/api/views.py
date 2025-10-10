@@ -112,6 +112,46 @@ def daily_deal(request):
 
 
 # ---------- ADD TO CART ----------
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def add_to_cart(request):
+#     product_id = request.data.get('product_id')
+#     quantity = int(request.data.get('quantity', 1))
+
+#     product = get_object_or_404(Product, id=product_id)
+
+#     order, created = Order.objects.get_or_create(
+#         user=request.user,
+#         status='Pending',
+#         defaults={'total_price': 0}
+#     )
+
+#     order_item, created_item = OrderItem.objects.get_or_create(
+#         order=order,
+#         product=product,
+#         defaults={'quantity': quantity, 'price': product.price}
+#     )
+#     # order_item = OrderItem.objects.create(
+#     #     order=order,
+#     #     product=product,
+#     #     quantity=quantity,
+#     #     price=product.price
+#     # )
+
+
+#     if not created_item:
+#         order_item.quantity += quantity
+#         order_item.save()
+
+#     order.total_price = sum(item.quantity * item.price for item in order.items.all())
+#     order.save()
+
+#     return Response({
+#         'message': 'Product added to cart successfully!',
+#         'order_id': order.id,
+#         'total_price': order.total_price
+#     })
+# ---------- ADD TO CART ----------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_to_cart(request):
@@ -120,29 +160,24 @@ def add_to_cart(request):
 
     product = get_object_or_404(Product, id=product_id)
 
-    order, created = Order.objects.get_or_create(
-        user=request.user,
-        status='Pending',
-        defaults={'total_price': 0}
-    )
+    # Safely get the first pending order, or create a new one if none exist
+    order = Order.objects.filter(user=request.user, status='Pending').first()
+    if not order:
+        order = Order.objects.create(user=request.user, status='Pending', total_price=0)
 
+    # Get or create the OrderItem
     order_item, created_item = OrderItem.objects.get_or_create(
         order=order,
         product=product,
         defaults={'quantity': quantity, 'price': product.price}
     )
-    # order_item = OrderItem.objects.create(
-    #     order=order,
-    #     product=product,
-    #     quantity=quantity,
-    #     price=product.price
-    # )
 
-
+    # If item already exists, just increase the quantity
     if not created_item:
         order_item.quantity += quantity
         order_item.save()
 
+    # Update the total price of the order
     order.total_price = sum(item.quantity * item.price for item in order.items.all())
     order.save()
 
@@ -151,6 +186,7 @@ def add_to_cart(request):
         'order_id': order.id,
         'total_price': order.total_price
     })
+
 
 
 # ----------  COUNT CART ----------
@@ -163,40 +199,161 @@ def cart_item_count(request):
     total_count = OrderItem.objects.filter(order__user=user, order__status='Pending').count()
     return Response({'count': total_count})
 
+# # ---------- PAYMENT INTENT ----------
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def create_payment_intent(request):
+#     print("Request data:", request.data)
+#     print("User:", request.user)
+
+#     user = request.user
+#     selected_item_ids = request.data.get('selected_item_ids', [])
+    
+    
+#     if not selected_item_ids:
+#         return Response({'error': 'No items selected'}, status=400)
+
+#     items = OrderItem.objects.filter(id__in=selected_item_ids, order__user=user, order__status='Pending')
+#     if not items.exists():
+#         return Response({'error': 'Selected items not found'}, status=404)
+
+#     temp_order = Order.objects.create(user=user, status='Pending', total_price=0)
+#     for item in items:
+#         item.order = temp_order
+#         item.save()
+
+#     temp_order.total_price = sum(item.quantity * item.price for item in items)
+#     temp_order.save()
+
+#     # temp_order = Order.objects.create(user=user, status='Pending', total_price=0)
+#     # for item in items:
+#     #     OrderItem.objects.create(
+#     #         order=temp_order,
+#     #         product=item.product,
+#     #         quantity=item.quantity,
+#     #         price=item.price
+#     #     )
+
+
+#     amount = int(temp_order.total_price * 100)
+#     secret_key = settings.PAYMONGO_SECRET_KEY
+#     auth_token = base64.b64encode(f"{secret_key}:".encode()).decode()
+#     headers = {
+#         'Authorization': f'Basic {auth_token}',
+#         'Content-Type': 'application/json',
+#         'Accept': 'application/json',
+#     }
+
+#     payload = {
+#         "data": {
+#             "attributes": {
+#                 "amount": amount,
+#                 "payment_method_allowed": ["gcash"],
+#                 "currency": "PHP",
+#                 "description": f"Order #{temp_order.id}",
+#             }
+#         }
+#     }
+
+#     print("=== DEBUG: Creating PayMongo Payment Intent ===")
+#     print("Temp order total_price:", temp_order.total_price)
+#     print("Amount sent to PayMongo (in cents):", amount)
+#     print("Payload being sent to PayMongo:", json.dumps(payload, indent=2))
+
+#     amount = int(temp_order.total_price * 100)
+
+#     # Minimum amount check before calling PayMongo
+#     if amount < 2000:
+#         return Response({'error': 'Minimum GCash payment is ₱20.00'}, status=400)
+
+#     response = requests.post(f"{settings.PAYMONGO_BASE_URL}/payment_intents", headers=headers, json=payload)
+#     data = response.json()
+
+#     if "data" not in data:
+#         return Response({'error': 'Failed to create payment intent', 'details': data}, status=400)
+
+#     # Payment method
+#     pm_response = requests.post(
+#         f"{settings.PAYMONGO_BASE_URL}/payment_methods",
+#         headers=headers,
+#         json={"data": {"attributes": {"type": "gcash"}}}
+#     )
+#     pm_data = pm_response.json()
+#     payment_method_id = pm_data["data"]["id"]
+
+#     # Attach payment
+#     attach_response = requests.post(
+#         f"{settings.PAYMONGO_BASE_URL}/payment_intents/{data['data']['id']}/attach",
+#         headers=headers,
+#         json={
+#             "data": {
+#                 "attributes": {
+#                     "payment_method": payment_method_id,
+#                     "return_url": "http://localhost:5173/payment-success"
+#                 }
+#             }
+#         }
+#     )
+#     attach_data = attach_response.json()
+
+#     checkout_url = attach_data.get("data", {}).get("attributes", {}).get("next_action", {}) \
+#         .get("redirect", {}).get("url")
+#     if not checkout_url:
+#         return Response({'error': 'Failed to get checkout URL', 'details': attach_data}, status=500)
+
+#     # Save payment
+#     Payment.objects.create(
+#         order=temp_order,
+#         paymongo_payment_id=data['data']['id'],
+#         amount=temp_order.total_price,
+#         status='Pending',
+#         checkout_url=checkout_url
+#     )
+
+#     return Response({
+#         "payment_intent_id": data['data']['id'],
+#         "client_key": data['data']['attributes']['client_key'],
+#         "amount": temp_order.total_price,
+#         "checkout_url": checkout_url
+#     })
+
 # ---------- PAYMENT INTENT ----------
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_payment_intent(request):
     user = request.user
     selected_item_ids = request.data.get('selected_item_ids', [])
-    
-    
+
     if not selected_item_ids:
         return Response({'error': 'No items selected'}, status=400)
 
-    items = OrderItem.objects.filter(id__in=selected_item_ids, order__user=user, order__status='Pending')
+    # Get the selected order items
+    items = OrderItem.objects.filter(
+        id__in=selected_item_ids,
+        order__user=user,
+        order__status='Pending'
+    )
+
     if not items.exists():
         return Response({'error': 'Selected items not found'}, status=404)
 
+    # Create a temporary order for payment
     temp_order = Order.objects.create(user=user, status='Pending', total_price=0)
     for item in items:
         item.order = temp_order
         item.save()
 
-    # temp_order.total_price = sum(item.quantity * item.price for item in items)
-    # temp_order.save()
+    temp_order.total_price = sum(item.quantity * item.price for item in items)
+    temp_order.save()
 
-    temp_order = Order.objects.create(user=user, status='Pending', total_price=0)
-    for item in items:
-        OrderItem.objects.create(
-            order=temp_order,
-            product=item.product,
-            quantity=item.quantity,
-            price=item.price
-        )
-
-
+    # Convert to cents for PayMongo
     amount = int(temp_order.total_price * 100)
+
+    # Minimum GCash payment check (₱20 = 2000 cents)
+    if amount < 2000:
+        return Response({'error': 'Minimum GCash payment is ₱20.00'}, status=400)
+
+    # Prepare PayMongo headers
     secret_key = settings.PAYMONGO_SECRET_KEY
     auth_token = base64.b64encode(f"{secret_key}:".encode()).decode()
     headers = {
@@ -205,6 +362,7 @@ def create_payment_intent(request):
         'Accept': 'application/json',
     }
 
+    # Payload for payment intent
     payload = {
         "data": {
             "attributes": {
@@ -216,52 +374,62 @@ def create_payment_intent(request):
         }
     }
 
+    # Create payment intent
     response = requests.post(f"{settings.PAYMONGO_BASE_URL}/payment_intents", headers=headers, json=payload)
     data = response.json()
 
-    if "data" in data:
-        payment_intent_id = data["data"]["id"]
-        client_key = data["data"]["attributes"]["client_key"]
+    if "data" not in data:
+        return Response({'error': 'Failed to create payment intent', 'details': data}, status=400)
 
-        pm_response = requests.post(f"{settings.PAYMONGO_BASE_URL}/payment_methods",
-            headers=headers,
-            json={"data": {"attributes": {"type": "gcash"}}})
-        
-        pm_data = pm_response.json()
-        payment_method_id = pm_data["data"]["id"]
+    payment_intent_id = data['data']['id']
+    client_key = data['data']['attributes']['client_key']
 
-        attach_response = requests.post(
-            f"{settings.PAYMONGO_BASE_URL}/payment_intents/{payment_intent_id}/attach",
-            headers=headers,
-            json={
-                "data": {
-                    "attributes": {
-                        "payment_method": payment_method_id,
-                        "return_url": "http://localhost:5173/payment-success"
-                    }
+    # Create payment method
+    pm_response = requests.post(
+        f"{settings.PAYMONGO_BASE_URL}/payment_methods",
+        headers=headers,
+        json={"data": {"attributes": {"type": "gcash"}}}
+    )
+    pm_data = pm_response.json()
+    payment_method_id = pm_data.get("data", {}).get("id")
+    if not payment_method_id:
+        return Response({'error': 'Failed to create payment method', 'details': pm_data}, status=400)
+
+    # Attach payment method with dynamic return URL
+    attach_response = requests.post(
+        f"{settings.PAYMONGO_BASE_URL}/payment_intents/{payment_intent_id}/attach",
+        headers=headers,
+        json={
+            "data": {
+                "attributes": {
+                    "payment_method": payment_method_id,
+                    "return_url": settings.PAYMONGO_RETURN_URL
                 }
             }
-        )
+        }
+    )
+    attach_data = attach_response.json()
 
-        attach_data = attach_response.json()
-        checkout_url = attach_data["data"]["attributes"]["next_action"]["redirect"]["url"]
+    checkout_url = attach_data.get("data", {}).get("attributes", {}).get("next_action", {}).get("redirect", {}).get("url")
+    if not checkout_url:
+        return Response({'error': 'Failed to get checkout URL', 'details': attach_data}, status=500)
 
-        Payment.objects.create(
-            order=temp_order,
-            paymongo_payment_id=payment_intent_id,
-            amount=temp_order.total_price,
-            status='Pending',
-            checkout_url=checkout_url
-        )
+    # Save the payment record
+    Payment.objects.create(
+        order=temp_order,
+        paymongo_payment_id=payment_intent_id,
+        amount=temp_order.total_price,
+        status='Pending',
+        checkout_url=checkout_url
+    )
 
-        return Response({
-            "payment_intent_id": payment_intent_id,
-            "client_key": client_key,
-            "amount": temp_order.total_price,
-            "checkout_url": checkout_url
-        })
+    return Response({
+        "payment_intent_id": payment_intent_id,
+        "client_key": client_key,
+        "amount": temp_order.total_price,
+        "checkout_url": checkout_url
+    })
 
-    return Response(data, status=response.status_code)
 
 # ---------- PAYMENT WEBHOOK ----------
 @csrf_exempt

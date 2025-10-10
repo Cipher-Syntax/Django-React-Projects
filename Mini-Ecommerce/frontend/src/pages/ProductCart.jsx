@@ -68,9 +68,6 @@ const ProductCart = () => {
     };
 
 
-
-
-
     useEffect(() => {
         const totalAmount = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
         setTotal(totalAmount)
